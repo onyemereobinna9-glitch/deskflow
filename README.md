@@ -64,7 +64,6 @@ services/
 api_service.dart
 
 main.dart
-
 ---
 
 ## 🔐 Security
@@ -78,7 +77,13 @@ main.dart
 
 ## 📸 Screenshots
 
-Coming soon
+| Login | Dashboard | Customers |
+|---|---|---|
+| ![Login](screenshots/Login.png) | ![Dashboard](screenshots/Dashboard.png) | ![Customers](screenshots/Customers.png) |
+
+| Tickets | Reviews | Add Customer |
+|---|---|---|
+| ![Tickets](screenshots/Tickets.png) | ![Reviews](screenshots/Reviews.png) | ![Add Customer](screenshots/add_customer.png) |
 
 ---
 
@@ -90,7 +95,6 @@ cd deskflow-backend
 npm run setup
 
 npm start
-
 ### Flutter App
 cd deskflow
 
