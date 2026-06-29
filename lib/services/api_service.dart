@@ -63,3 +63,43 @@ Future<List<dynamic>> fetchTickets() async {
   }
   throw Exception('Failed to load tickets (${response.statusCode})');
 }
+
+Future<http.Response> apiPost(String endpoint, Map<String, dynamic> body) async {
+  final response = await http.post(
+    Uri.parse('$baseUrl$endpoint'),
+    headers: {
+      'Content-Type': 'application/json',
+      if (sessionCookie != null) 'Cookie': sessionCookie!,
+    },
+    body: jsonEncode(body),
+  );
+  return response;
+}
+
+Future<Map<String, dynamic>> fetchStats() async {
+  final results = await Future.wait([
+    http.get(Uri.parse('$baseUrl/customers'), headers: _headers),
+    http.get(Uri.parse('$baseUrl/tickets'), headers: _headers),
+    http.get(Uri.parse('$baseUrl/reviews'), headers: _headers),
+  ]);
+
+  final customers = jsonDecode(results[0].body) as List<dynamic>;
+  final tickets = jsonDecode(results[1].body) as List<dynamic>;
+  final reviews = jsonDecode(results[2].body) as List<dynamic>;
+
+  final openTickets = tickets.where((t) => t['status'] == 'open').length;
+  final avgRating = reviews.isEmpty
+      ? 0.0
+      : reviews.fold<double>(0, (sum, r) => sum + (r['rating'] as num)) /
+          reviews.length;
+
+  final recentTickets = tickets.take(5).toList();
+
+  return {
+    'totalCustomers': customers.length,
+    'openTickets': openTickets,
+    'avgRating': avgRating,
+    'totalReviews': reviews.length,
+    'recentTickets': recentTickets,
+  };
+}

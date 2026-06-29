@@ -3,6 +3,8 @@ import 'screens/customers_screen.dart';
 import 'screens/reviews_screen.dart';
 import 'screens/tickets_screen.dart';
 import 'screens/login_screen.dart';
+import 'screens/dashboard_screen.dart';
+import 'screens/admins_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -68,12 +70,18 @@ class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
 
   final List<Widget> _screens = [
+    const DashboardScreen(),
     const CustomersScreen(),
     const ReviewsScreen(),
     const TicketsScreen(),
   ];
 
-  final List<String> _titles = ['Customers', 'Reviews', 'Tickets'];
+  final List<String> _titles = [
+    'Dashboard',
+    'Customers',
+    'Reviews',
+    'Tickets',
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -96,6 +104,18 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.person_add_outlined,
+                color: Colors.white54, size: 20),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const AdminsScreen(),
+                ),
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.logout, color: Colors.white54, size: 20),
             onPressed: () {
@@ -120,6 +140,11 @@ class _HomeScreenState extends State<HomeScreen> {
         currentIndex: _currentIndex,
         onTap: (index) => setState(() => _currentIndex = index),
         items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.dashboard_outlined),
+            activeIcon: Icon(Icons.dashboard),
+            label: 'Dashboard',
+          ),
           BottomNavigationBarItem(
             icon: Icon(Icons.people_outline),
             activeIcon: Icon(Icons.people),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
+import 'add_ticket_screen.dart';
 
 class TicketsScreen extends StatefulWidget {
   const TicketsScreen({super.key});
@@ -18,8 +19,23 @@ class _TicketsScreenState extends State<TicketsScreen> {
   }
 
   Future<void> _refresh() async {
-    final data = fetchTickets();
-    setState(() => _tickets = data);
+    setState(() {
+      _tickets = fetchTickets();
+    });
+  }
+
+  void _navigateToAdd() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const AddTicketScreen(),
+      ),
+    );
+    if (result == true) {
+      setState(() {
+        _tickets = fetchTickets();
+      });
+    }
   }
 
   Color _statusColor(String status) {
@@ -77,91 +93,117 @@ class _TicketsScreenState extends State<TicketsScreen> {
         final tickets = snapshot.data!;
 
         if (tickets.isEmpty) {
-          return const Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.confirmation_number_outlined,
-                    color: Color(0xFF6366F1), size: 48),
-                SizedBox(height: 16),
-                Text('No tickets yet',
-                    style: TextStyle(color: Colors.white70, fontSize: 16)),
-              ],
-            ),
+          return Stack(
+            children: [
+              const Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.confirmation_number_outlined,
+                        color: Color(0xFF6366F1), size: 48),
+                    SizedBox(height: 16),
+                    Text('No tickets yet',
+                        style: TextStyle(color: Colors.white70, fontSize: 16)),
+                  ],
+                ),
+              ),
+              Positioned(
+                bottom: 24,
+                right: 24,
+                child: FloatingActionButton(
+                  onPressed: _navigateToAdd,
+                  backgroundColor: const Color(0xFF6366F1),
+                  child: const Icon(Icons.add, color: Colors.white),
+                ),
+              ),
+            ],
           );
         }
 
-        return RefreshIndicator(
-          onRefresh: _refresh,
-          color: const Color(0xFF6366F1),
-          backgroundColor: const Color(0xFF111827),
-          child: ListView.builder(
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-            itemCount: tickets.length,
-            itemBuilder: (context, index) {
-              final t = tickets[index];
-              final status = t['status'] ?? '';
-              return Container(
-                margin: const EdgeInsets.only(bottom: 10),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF111827),
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: const Color(0xFF1E2030), width: 1),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: _statusColor(status).withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Icon(
-                          _statusIcon(status),
-                          color: _statusColor(status),
-                          size: 20,
-                        ),
-                      ),
-                      const SizedBox(width: 14),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              t['subject'] ?? '',
-                              style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 14),
+        return Stack(
+          children: [
+            RefreshIndicator(
+              onRefresh: _refresh,
+              color: const Color(0xFF6366F1),
+              backgroundColor: const Color(0xFF111827),
+              child: ListView.builder(
+                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                itemCount: tickets.length,
+                itemBuilder: (context, index) {
+                  final t = tickets[index];
+                  final status = t['status'] ?? '';
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 10),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF111827),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: const Color(0xFF1E2030), width: 1),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: _statusColor(status).withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(10),
                             ),
-                            const SizedBox(height: 4),
-                            Text(
-                              t['customer_name'] ?? '',
-                              style: const TextStyle(
-                                  color: Colors.white38, fontSize: 12),
+                            child: Icon(
+                              _statusIcon(status),
+                              color: _statusColor(status),
+                              size: 20,
                             ),
-                          ],
-                        ),
+                          ),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  t['subject'] ?? '',
+                                  style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 14),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  t['customer_name'] ?? '',
+                                  style: const TextStyle(
+                                      color: Colors.white38, fontSize: 12),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Chip(
+                            label: Text(status),
+                            backgroundColor: _statusColor(status).withOpacity(0.15),
+                            labelStyle: TextStyle(
+                                color: _statusColor(status),
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600),
+                            side: BorderSide(
+                                color: _statusColor(status).withOpacity(0.3)),
+                          ),
+                        ],
                       ),
-                      Chip(
-                        label: Text(status),
-                        backgroundColor: _statusColor(status).withOpacity(0.15),
-                        labelStyle: TextStyle(
-                            color: _statusColor(status),
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600),
-                        side: BorderSide(
-                            color: _statusColor(status).withOpacity(0.3)),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            Positioned(
+              bottom: 24,
+              right: 24,
+              child: FloatingActionButton(
+                onPressed: _navigateToAdd,
+                backgroundColor: const Color(0xFF6366F1),
+                child: const Icon(Icons.add, color: Colors.white),
+              ),
+            ),
+          ],
         );
       },
     );
