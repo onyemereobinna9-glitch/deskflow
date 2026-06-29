@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-const String baseUrl = 'http://10.94.157.50:3000/api';
-const String authUrl = 'http://10.94.157.50:3000';
+const String baseUrl = 'https://deskflow-backend-production-8f7e.up.railway.app/api';
+const String authUrl = 'https://deskflow-backend-production-8f7e.up.railway.app';
 
 String? sessionCookie;
 
